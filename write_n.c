@@ -66,7 +66,7 @@ static ssize_t write_n_write(struct file * file, const char __user * out, size_t
         *off = new_pos - to_write;
     }
     mutex_unlock(&buf_mutex);
-    return written;
+    return written ? written : -ENOSPC;
 }
 
 static struct file_operations write_n_ops = {
@@ -80,7 +80,8 @@ static struct file_operations write_n_ops = {
 static struct miscdevice write_n_dev = {
     .minor=MISC_DYNAMIC_MINOR,
     .name="write_n",
-    .fops=&write_n_ops
+    .fops=&write_n_ops,
+    .mode= S_IRUGO | S_IWUGO
 };
 
 static int __init write_n_init(void)
