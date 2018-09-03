@@ -57,7 +57,7 @@ static ssize_t write_n_write(struct file * file, const char __user * out, size_t
     written = 0;
     while(*off < new_pos) {
         to_write = copy_from_user(buf+*off, out+written, to_write);
-        // check if write to userspace succeeded
+        // check if read from userspace succeeded
         if(to_write < 0) {
             mutex_unlock(&buf_mutex);
             return -EFAULT;
@@ -88,6 +88,10 @@ static int __init write_n_init(void)
 {
     size_t i;
     printk(KERN_INFO "Creating write_n\n");
+    if(max_length < 1) {
+        printk(KERN_INFO "write_n: max_length has to be > 0\n");
+        return 1;
+    }
     buf = kmalloc(max_length, GFP_KERNEL);
     if(buf == NULL) {
         printk(KERN_INFO "write_n: failed to allocate buffer\n");
